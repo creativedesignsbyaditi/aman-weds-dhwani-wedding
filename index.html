@@ -2,126 +2,42 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=360, initial-scale=1.0, viewport-fit=cover">
 <title>Wedding Invitation</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;background:#000;font-family:Arial,sans-serif}
-body{overflow:hidden}
-#app{width:100%;height:100dvh;position:relative;background:#000;overflow:hidden}
-.screen{position:absolute;inset:0;display:none}
-.screen.active{display:block}
+html,body{margin:0;width:100%;height:100%;background:#000;overflow:hidden}
+body{display:flex;align-items:center;justify-content:center}
+#app{position:relative;width:360px;height:720px;max-width:100vw;max-height:100dvh;overflow:hidden;background:#f4ecdf;perspective:1400px}
 
-/* Envelope */
-#envelopeScreen{background:#f4f2dc;display:flex;align-items:center;justify-content:center}
-#openEnvelope{
-  width:min(86vw,420px);height:min(70vh,620px);border:0;background:transparent;
-  cursor:pointer;position:relative;font-size:0
-}
-#openEnvelope .envelope{
-  position:absolute;inset:12%;background:#e8d9b8;border-radius:8px;
-  box-shadow:0 12px 35px rgba(0,0,0,.25)
-}
-#openEnvelope .flap{
-  position:absolute;left:12%;right:12%;top:12%;height:43%;
-  background:#d7c29a;clip-path:polygon(0 0,100% 0,50% 100%);
-  transform-origin:top center;transition:transform 1.1s cubic-bezier(.2,.8,.2,1)
-}
-#openEnvelope .seal{
-  position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);
-  width:68px;height:68px;border-radius:50%;background:#9b3b35;color:#fff;
-  display:grid;place-items:center;font-size:22px;box-shadow:0 5px 15px rgba(0,0,0,.2)
-}
-#openEnvelope.open .flap{transform:rotateX(180deg)}
-#openEnvelope.open{pointer-events:none}
+/* Exact envelope artwork supplied by you */
+#envelope{position:absolute;inset:0;width:360px;height:720px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+#body{position:absolute;left:0;bottom:0;width:360px;height:657px;display:block;z-index:2}
+#flap{position:absolute;left:0;top:0;width:360px;height:445px;display:block;z-index:4;transform-origin:50% 0%;transform:rotateX(0deg);transition:transform 1.25s cubic-bezier(.18,.78,.2,1);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+#openButton{position:absolute;inset:0;z-index:10;border:0;background:transparent;cursor:pointer}
+#envelope.open #flap{transform:rotateX(-78deg) translateY(-12px)}
+#envelope.open #openButton{pointer-events:none}
 
-/* Invitation */
-#invitation{overflow-y:auto;scroll-snap-type:y mandatory;scroll-behavior:smooth;background:#000}
-.event{
-  position:relative;width:100%;height:100dvh;min-height:100dvh;
-  scroll-snap-align:start;overflow:hidden;background:#000
-}
-.event video.main-video{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover
-}
-.wardrobe-btn{
-  position:absolute;left:50%;bottom:6.5%;transform:translateX(-50%);
-  border:0;border-radius:999px;padding:13px 22px;
-  background:rgba(255,255,255,.9);color:#222;font-weight:700;
-  letter-spacing:.5px;cursor:pointer;z-index:5;
-  box-shadow:0 5px 20px rgba(0,0,0,.25)
-}
+/* Smooth transition to Canva */
+#fade{position:absolute;inset:0;z-index:50;background:#f4ecdf;opacity:0;pointer-events:none;transition:opacity .55s ease}
+#fade.show{opacity:1}
 
-/* Music */
-#musicBtn{
-  position:fixed;right:14px;bottom:14px;width:48px;height:48px;border-radius:50%;
-  border:1px solid rgba(255,255,255,.7);background:rgba(0,0,0,.45);color:#fff;
-  z-index:1000;cursor:pointer;font-size:20px;backdrop-filter:blur(6px)
-}
-
-/* Wardrobe overlay */
-#wardrobeOverlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.62);
-  z-index:2000;display:none;align-items:center;justify-content:center;
-  padding:20px;opacity:0;transition:opacity .25s ease
-}
-#wardrobeOverlay.show{display:flex;opacity:1}
-#wardrobeCard{
-  position:relative;width:min(92vw,360px);height:min(86vh,680px);
-  border-radius:10px;overflow:hidden;background:#000;
-  box-shadow:0 20px 70px rgba(0,0,0,.55);
-  transform:scale(.92);transition:transform .3s cubic-bezier(.2,.8,.2,1)
-}
-#wardrobeOverlay.show #wardrobeCard{transform:scale(1)}
-#wardrobeVideo{width:100%;height:100%;object-fit:cover;display:block}
-#backBtn{
-  position:absolute;right:10px;top:10px;width:42px;height:42px;border-radius:50%;
-  border:0;background:rgba(0,0,0,.55);color:#fff;font-size:25px;line-height:42px;
-  z-index:10;cursor:pointer
-}
-@media(min-width:700px){
-  #app{width:360px;height:720px;max-height:100dvh;margin:auto}
-}
+/* Music button */
+#musicBtn{position:absolute;right:12px;bottom:12px;width:46px;height:46px;border:1px solid rgba(255,255,255,.75);border-radius:50%;background:rgba(0,0,0,.45);color:#fff;font-size:19px;z-index:30;cursor:pointer;backdrop-filter:blur(6px)}
+@media(max-width:359px){#app{transform:scale(calc(100vw / 360));transform-origin:center center}}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <section id="envelopeScreen" class="screen active">
-    <button id="openEnvelope" aria-label="Open invitation">
-      <span class="envelope"></span>
-      <span class="flap"></span>
-      <span class="seal">✦</span>
-    </button>
-  </section>
-
-  <main id="invitation" class="screen" aria-label="Wedding invitation">
-    <section class="event">
-      <video class="main-video" src="haldi-main.mp4" muted playsinline loop preload="auto"></video>
-      <button class="wardrobe-btn" data-card="haldi-wardrobe.mp4">TAP FOR WARDROBE</button>
-    </section>
-    <section class="event">
-      <video class="main-video" src="sangeet-main.mp4" muted playsinline loop preload="auto"></video>
-      <button class="wardrobe-btn" data-card="sangeet-wardrobe.mp4">TAP FOR WARDROBE</button>
-    </section>
-    <section class="event">
-      <video class="main-video" src="wedding-main.mp4" muted playsinline loop preload="auto"></video>
-      <button class="wardrobe-btn" data-card="wedding-wardrobe.mp4">TAP FOR WARDROBE</button>
-    </section>
-    <section class="event">
-      <video class="main-video" src="reception-main.mp4" muted playsinline loop preload="auto"></video>
-      <button class="wardrobe-btn" data-card="reception-wardrobe.mp4">TAP FOR WARDROBE</button>
-    </section>
-  </main>
-
-  <button id="musicBtn" aria-label="Turn music on/off">🔇</button>
-
-  <div id="wardrobeOverlay" aria-hidden="true">
-    <div id="wardrobeCard">
-      <button id="backBtn" aria-label="Back">←</button>
-      <video id="wardrobeVideo" muted playsinline controls></video>
-    </div>
+  <div id="envelope" aria-label="Open wedding invitation">
+    <img id="body" src="body.png" alt="">
+    <img id="flap" src="flap.png" alt="">
+    <button id="openButton" aria-label="Open invitation"></button>
   </div>
+
+  <button id="musicBtn" aria-label="Turn music on">🔇</button>
+  <div id="fade"></div>
 
   <audio id="bgMusic" preload="auto" loop>
     <source src="music.mp3" type="audio/mpeg">
@@ -129,92 +45,56 @@ body{overflow:hidden}
 </div>
 
 <script>
-const envelopeScreen = document.getElementById('envelopeScreen');
-const openEnvelope = document.getElementById('openEnvelope');
-const invitation = document.getElementById('invitation');
-const music = document.getElementById('bgMusic');
-const musicBtn = document.getElementById('musicBtn');
-const wardrobeOverlay = document.getElementById('wardrobeOverlay');
-const wardrobeVideo = document.getElementById('wardrobeVideo');
-const backBtn = document.getElementById('backBtn');
+const CANVA_URL = "https://amanwedsdhwani.life/bride";
 
-let musicOn = false;
+const envelope = document.getElementById("envelope");
+const openButton = document.getElementById("openButton");
+const music = document.getElementById("bgMusic");
+const musicBtn = document.getElementById("musicBtn");
+const fade = document.getElementById("fade");
+
+let opened = false;
 
 async function startMusic(){
   try{
     await music.play();
-    musicOn = true;
-    musicBtn.textContent = '🎵';
-  }catch(e){
-    musicOn = false;
-    musicBtn.textContent = '🔇';
+    musicBtn.textContent = "🎵";
+    musicBtn.setAttribute("aria-label","Turn music off");
+  }catch(error){
+    musicBtn.textContent = "🔇";
+    musicBtn.setAttribute("aria-label","Turn music on");
   }
 }
 
-openEnvelope.addEventListener('click', async () => {
-  openEnvelope.classList.add('open');
+openButton.addEventListener("click", async () => {
+  if(opened) return;
+  opened = true;
+
+  /* Start music from the user's tap */
   await startMusic();
 
+  /* Open the supplied flap artwork */
+  envelope.classList.add("open");
+
+  /* Fade smoothly before leaving */
+  setTimeout(() => fade.classList.add("show"), 1000);
+
+  /* Open the Canva website on the same tab */
   setTimeout(() => {
-    envelopeScreen.classList.remove('active');
-    invitation.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    const first = invitation.querySelector('.main-video');
-    if(first) first.play().catch(()=>{});
-  }, 1100);
+    window.location.href = CANVA_URL;
+  }, 1550);
 });
 
-musicBtn.addEventListener('click', async () => {
+musicBtn.addEventListener("click", async (event) => {
+  event.stopPropagation();
+
   if(music.paused){
     await startMusic();
   }else{
     music.pause();
-    musicOn = false;
-    musicBtn.textContent = '🔇';
+    musicBtn.textContent = "🔇";
+    musicBtn.setAttribute("aria-label","Turn music on");
   }
-});
-
-/* Automatically play the event video currently visible. */
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    const video = entry.target.querySelector('.main-video');
-    if(!video) return;
-    if(entry.isIntersecting && entry.intersectionRatio >= .6){
-      video.play().catch(()=>{});
-    }else{
-      video.pause();
-    }
-  });
-},{threshold:[.6]});
-
-document.querySelectorAll('.event').forEach(event => observer.observe(event));
-
-/* Wardrobe popup */
-document.querySelectorAll('.wardrobe-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    wardrobeVideo.pause();
-    wardrobeVideo.src = btn.dataset.card;
-    wardrobeVideo.currentTime = 0;
-    wardrobeOverlay.classList.add('show');
-    wardrobeOverlay.setAttribute('aria-hidden','false');
-    wardrobeVideo.play().catch(()=>{});
-  });
-});
-
-function closeWardrobe(){
-  wardrobeVideo.pause();
-  wardrobeVideo.removeAttribute('src');
-  wardrobeVideo.load();
-  wardrobeOverlay.classList.remove('show');
-  wardrobeOverlay.setAttribute('aria-hidden','true');
-}
-
-backBtn.addEventListener('click', closeWardrobe);
-wardrobeOverlay.addEventListener('click', e => {
-  if(e.target === wardrobeOverlay) closeWardrobe();
-});
-document.addEventListener('keydown', e => {
-  if(e.key === 'Escape') closeWardrobe();
 });
 </script>
 </body>
